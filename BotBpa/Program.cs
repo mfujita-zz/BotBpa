@@ -20,12 +20,13 @@ namespace BotBpa
             IWebDriver webDriver = new ChromeDriver(@"C:\Users\Murilo\source\repos\BotBpa\BotBpa\driver");
 
             webDriver.Navigate().GoToUrl("https://www.amazon.com/");
-            webDriver.SetText(By.Id("twotabsearchtextbox"), "iphone");
+            webDriver.SetText(By.Id("twotabsearchtextbox"), "scanner");
             webDriver.FindElement(By.ClassName("nav-input")).Click();
 
             var productName = webDriver.FindElements(By.ClassName("a-size-medium")).ToList();
             var productPrice = webDriver.FindElements(By.ClassName("a-price")).ToList();
-            
+            //Remover os atributos aria-hidden. Estes contém os preços talhados e devem ser eliminados.
+
             //Planilha Excel
             CreateExcel(productName, productPrice);
 
@@ -53,9 +54,14 @@ namespace BotBpa
             row = 1;
             foreach (var item in preco)
             {
-                row++;
-                string itemOk = item.Text.Replace("\r\n", ",");
-                ws.Cells[row, "B"] = itemOk;
+                if (item.Text == "")
+                    continue;
+                else
+                { 
+                    row++;
+                    string itemOk = item.Text.Replace("\r\n", ",");
+                    ws.Cells[row, "B"] = itemOk;
+                }
             }
 
             ws.Columns[1].AutoFit();
